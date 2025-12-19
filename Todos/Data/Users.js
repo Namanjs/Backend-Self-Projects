@@ -8,4 +8,8 @@ function getUsers() {
     return users;
 }
 
-module.exports = { addUser, getUsers };
+export { 
+    addUser,
+    getUsers,
+    users,
+};
