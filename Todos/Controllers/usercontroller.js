@@ -74,14 +74,14 @@ const signUpAsAdmin = async (req, res) => {
     }
 
     const duplicateAdmin = users
-    .filter((user) => {
-        return user.admin === true;
-    })
-    .find((user) => {
-        return user.username === Admin.username && user.email === Admin.email;
-    })
+        .filter((user) => {
+            return user.admin === true;
+        })
+        .find((user) => {
+            return user.username === Admin.username && user.email === Admin.email;
+        })
 
-    if(duplicateAdmin){
+    if (duplicateAdmin) {
         return res.status(400).json({
             "Message": "User with same credentials already exist"
         })
@@ -100,7 +100,7 @@ const addTodos = async (req, res) => {
 
         const user = req.user;
 
-        if(!title || !priority){
+        if (!title || !priority) {
             return res.status(400).json({
                 "Message": "Title and priority are required fields"
             })
@@ -110,7 +110,7 @@ const addTodos = async (req, res) => {
             return todo.title === title;
         })
 
-        if(duplicateTitle){
+        if (duplicateTitle) {
             return res.status(400).json({
                 "Message": "Todo with the title already exist"
             })
@@ -119,13 +119,13 @@ const addTodos = async (req, res) => {
         let randomNumber = Math.floor(Math.random() * 100000);
 
         let duplicate = user.todos.find((todo) => {
-            return user.todos.Id === randomNumber;
+            return todo.Id === randomNumber;
         });
 
         while (duplicate !== undefined) {
             randomNumber++;
             duplicate = user.todos.find((user) => {
-                return user.todos.Id === randomNumber;
+                return todo.Id === randomNumber;
             });
         }
 
@@ -141,8 +141,7 @@ const addTodos = async (req, res) => {
 
         return res.status(201).json({
             "Message": "Todo added successfully",
-            "Todo": todo,
-            "User": user
+            "Todo": todo
         })
     } catch (error) {
         return res.status(404).json({
@@ -151,10 +150,60 @@ const addTodos = async (req, res) => {
     }
 }
 
+const getTodos = async (req, res) => {
+    try {
+        const user = req.user;
 
+        if (user.todos.length === 0) {
+            return res.status(200).json({
+                "Message": "User has no active todos"
+            })
+        }
+
+        return res.status(201).json({
+            "Message": "Request sucessfull",
+            "Todo": user.todos
+        })
+    } catch (error) {
+        return res.status(400).json({
+            "Message": "Something went wrong while fetching user todos"
+        })
+    }
+}
+
+const getTodoById = async (req, res) => {
+    const user = req.user;
+
+    const { Id } = req.body;
+
+    if(!Id){
+        return res.status(400).json({
+            "Message": "Id is required"
+        })
+    }
+
+    const todoById = user.todos.find((todo) => {
+        return todo.Id === Number(Id);
+    })
+
+
+
+    if(!todoById){
+        return res.status(400).json({
+            "Message": "Todo with Id does not exist"
+        })
+    }
+
+    return res.status(200).json({
+        "User": user.username,
+        "Todo": todoById
+    })
+}
 
 export {
     signup,
     signUpAsAdmin,
-    addTodos
+    addTodos,
+    getTodos,
+    getTodoById
 }
