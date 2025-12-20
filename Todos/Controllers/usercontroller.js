@@ -48,7 +48,7 @@ const signup = async (req, res) => {
             "Info": user
         })
     } catch (error) {
-        return res.status(400).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
@@ -62,7 +62,7 @@ const signUpAsAdmin = async (req, res) => {
     }
 
     if (password !== "Na@21092004") {
-        res.status(400).json({
+        return res.status(401).json({
             "Message": "Password is incorrect"
         })
     }
@@ -124,7 +124,7 @@ const addTodos = async (req, res) => {
 
         while (duplicate !== undefined) {
             randomNumber++;
-            duplicate = user.todos.find((user) => {
+            duplicate = user.todos.find((todo) => {
                 return todo.Id === randomNumber;
             });
         }
@@ -133,8 +133,9 @@ const addTodos = async (req, res) => {
             "Id": randomNumber,
             "title": title,
             "description": description || "",
+            "priority": priority,
             "status": "incomplete",
-            "createdAt": new Date().toISOString
+            "createdAt": new Date().toISOString()
         }
 
         user.todos.push(todo);
@@ -144,7 +145,7 @@ const addTodos = async (req, res) => {
             "Todo": todo
         })
     } catch (error) {
-        return res.status(404).json({
+        return res.status(500).json({
             "Message": "Something went wrong while adding todos"
         })
     }
@@ -160,12 +161,12 @@ const getTodos = async (req, res) => {
             })
         }
 
-        return res.status(201).json({
-            "Message": "Request sucessfull",
+        return res.status(200).json({
+            "Message": "Request successful",
             "Todo": user.todos
         })
     } catch (error) {
-        return res.status(400).json({
+        return res.status(500).json({
             "Message": "Something went wrong while fetching user todos"
         })
     }
