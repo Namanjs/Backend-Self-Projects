@@ -173,32 +173,122 @@ const getTodos = async (req, res) => {
 }
 
 const getTodoById = async (req, res) => {
-    const user = req.user;
+    try {
+        const user = req.user;
 
-    const { Id } = req.body;
+        const { Id } = req.body;
 
-    if(!Id){
-        return res.status(400).json({
-            "Message": "Id is required"
+        if (!Id) {
+            return res.status(400).json({
+                "Message": "Id is required"
+            })
+        }
+
+        const todoById = user.todos.find((todo) => {
+            return todo.Id === Number(Id);
+        })
+
+
+
+        if (!todoById) {
+            return res.status(400).json({
+                "Message": "Todo with Id does not exist"
+            })
+        }
+
+        return res.status(200).json({
+            "User": user.username,
+            "Todo": todoById
+        })
+    } catch (error) {
+        return res.status(500).json({
+            "Message": "Something went wrong while fetching todo by Id"
         })
     }
+}
 
-    const todoById = user.todos.find((todo) => {
-        return todo.Id === Number(Id);
-    })
+const updateTodos = async (req, res) => {
+    try {
+        const user = req.user;
 
+        const { Todo_Id, newTitle, newDescription, newPriority, status } = req.body;
 
+        if (!newTitle && !newDescription && !newPriority && !status) {
+            return res.status(400).json({
+                "Message": "Atleast one field is required for updation"
+            })
+        }
 
-    if(!todoById){
-        return res.status(400).json({
-            "Message": "Todo with Id does not exist"
+        if (!Todo_Id) {
+            return res.status(400).json({
+                "Message": "Todo Id is required field"
+            })
+        }
+
+        const todo = user.todos.find((todo) => {
+            return todo.Id === Number(Todo_Id);
+        })
+
+        if (!todo) {
+            return res.status(400).json({
+                "Message": "Todo does not exist"
+            })
+        }
+
+        if (newTitle !== undefined) todo.title = newTitle;
+        if (newDescription !== undefined) todo.description = newDescription;
+        if (newPriority !== undefined) todo.priority = newPriority;
+        if (status !== undefined) todo.status = status;
+
+        todo.updatedAt = new Date().toISOString();
+
+        return res.status(200).json({
+            "Message": "Todo updated successfully",
+            "Updated Todo": todo
+        })
+    } catch (error) {
+        return res.status(500).json({
+            "Message": "Something went wrong while updating user todos"
         })
     }
+}
 
-    return res.status(200).json({
-        "User": user.username,
-        "Todo": todoById
-    })
+const deleteTodo = async (req, res) => {
+    try {
+        const { Id } = req.body;
+
+        const user = req.user;
+        
+        if(!Id){
+            return res.status(400).json({
+                "Message": "Id is required"
+            })
+        }
+
+        const todo = user.todos.find((todo) => {
+            return todo.Id === Number(Id);
+        })
+
+        if(!todo){
+            return res.status(400).json({
+                "Message": "Todo with this Id does not exist"
+            })
+        }
+
+        const TodosAfterDeletion = user.todos.filter((todo) => {
+            return todo.Id !== Number(Id);
+        })
+
+        user.todos = TodosAfterDeletion;
+
+        return res.status(200).json({
+            "Message": "Todo successfully deleted"
+        })
+    } catch (error) {
+        return res.status(500).json({
+            "Message": "Something went wrong while deleting todos"
+        })
+    }
 }
 
 export {
@@ -206,5 +296,7 @@ export {
     signUpAsAdmin,
     addTodos,
     getTodos,
-    getTodoById
+    getTodoById,
+    updateTodos,
+    deleteTodo
 }

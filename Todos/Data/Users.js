@@ -11,5 +11,5 @@ function getUsers() {
 export { 
     addUser,
     getUsers,
-    users,
+    users
 };

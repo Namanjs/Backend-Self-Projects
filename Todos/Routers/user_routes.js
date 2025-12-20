@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signup, signUpAsAdmin, addTodos, getTodos, getTodoById } from '../Controllers/usercontroller.js'
+import { signup, signUpAsAdmin, addTodos, getTodos, getTodoById, updateTodos, deleteTodo } from '../Controllers/usercontroller.js'
 import { isLoggedIn } from "../middlewares/isSignedIn.js";
 
 const router = Router();
@@ -13,5 +13,9 @@ router.route("/addtodo").post(isLoggedIn, addTodos); // checks if the user is si
 router.route("/gettodo").get(isLoggedIn, getTodos); // allows user to fetch all of his todos
 
 router.route("/getTodoById").get(isLoggedIn, getTodoById); // get the todo by specific id
+
+router.route("/updateTodo").patch(isLoggedIn, updateTodos); // update todos
+
+router.route("/deleteTodo").delete(isLoggedIn, deleteTodo);
 
 export default router;
